@@ -15,6 +15,7 @@ RUN npm install --production
 COPY model ./model
 COPY server.js ./
 COPY supabaseStorage.js ./
+COPY edgeImpulseService.js ./
 
 EXPOSE 3000
 
