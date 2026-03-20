@@ -1,5 +1,5 @@
 {
-  "name": "greenbin-tm-api",
+  "name": "greenbin-api",
   "version": "1.0.0",
   "description": "TensorFlow.js waste classification API",
   "main": "server.js",

@@ -1,6 +1,6 @@
 # GreenBin Waste Classification API
 
-TensorFlow.js image classification API for waste sorting (Paper, Plastic, Biodegradable).
+Dual-model image classification API for waste sorting (Paper, Plastic, Biodegradable) using TensorFlow.js Teachable Machine and EdgeImpulse.
 
 ## Quick Start
 
@@ -16,9 +16,25 @@ API runs on `http://localhost:3000`
 ### `POST /predict`
 Upload image for classification
 
-**Request:**
+**Parameters:**
+- `image`: Image file (required)
+- `model`: Classification model - `teachablemachine` (default) or `edgeimpulse` (optional)
+- `deviceId`: Device identifier for tracking (optional)
+
+**Request Examples:**
 ```bash
+# Default TeachableMachine model
 curl -X POST http://localhost:3000/predict \
+  -F "image=@path/to/image.jpg"
+
+# EdgeImpulse model
+curl -X POST http://localhost:3000/predict \
+  -F "image=@path/to/image.jpg" \
+  -F "model=edgeimpulse" \
+  -F "deviceId=device123"
+
+# Query parameter also works
+curl -X POST "http://localhost:3000/predict?model=edgeimpulse" \
   -F "image=@path/to/image.jpg"
 ```
 
@@ -27,6 +43,7 @@ curl -X POST http://localhost:3000/predict \
 {
   "prediction": "Paper",
   "confidence": 0.95,
+  "deviceId": "device123",
   "expectedImageUrl": "https://your-project.supabase.co/storage/v1/object/public/waste-images/paper/1234567890-abc123.jpg",
   "storageUpload": "background",
   "allPredictions": [
@@ -51,6 +68,21 @@ Health check endpoint
 
 ### `GET /info`
 Model information and labels
+
+## Classification Models
+
+### TeachableMachine (Default)
+- **Type**: Local TensorFlow.js model
+- **Advantages**: Fast inference, no external dependencies, works offline
+- **Use Case**: Standard production usage
+
+### EdgeImpulse
+- **Type**: External API call
+- **Advantages**: Leverages deployed EdgeImpulse models, potentially better accuracy
+- **Requirements**: `EDGEIMPULSE_API_URL` environment variable
+- **Use Case**: When EdgeImpulse model performance is preferred
+
+**Note**: Both models return identical response formats for seamless integration.
 
 ## Supabase Storage Integration
 
@@ -103,6 +135,9 @@ Set these in your deployment platform:
 - `SUPABASE_KEY`: Service role key (not anon key)
 - `SUPABASE_BUCKET`: Storage bucket name (default: waste-images)
 
+**Optional (for EdgeImpulse model):**
+- `EDGEIMPULSE_API_URL`: EdgeImpulse inference endpoint URL
+
 ### Railway
 1. Push code to GitHub
 2. Create new project on railway.app
@@ -123,7 +158,15 @@ Set these in your deployment platform:
 # Health check
 curl http://localhost:3000/health
 
-# Classify image
+# Classify image (default TeachableMachine)
 curl -X POST http://localhost:3000/predict \
   -F "image=@test-image.jpg"
+
+# Classify image (EdgeImpulse)
+curl -X POST http://localhost:3000/predict \
+  -F "image=@test-image.jpg" \
+  -F "model=edgeimpulse"
+
+# Get model information
+curl http://localhost:3000/info
 ```

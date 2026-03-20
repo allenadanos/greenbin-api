@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: greenbin-tm-api
+    name: greenbin-api
     env: node
     buildCommand: npm install
     startCommand: node server.js
